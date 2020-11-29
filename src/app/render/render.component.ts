@@ -1,3 +1,4 @@
+import { ImagensMock } from './../../models/ImagensMock';
 import { Component, OnInit } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -47,11 +48,12 @@ export class RenderComponent implements OnInit {
     this.createCanvas();
     this.createPhongLightning();
     //this.configCamera()
+    this.createMesh('idNoTexture');
   }
 
   ngAfterViewInit(){
     this.configControls();
-    this.createMesh('idNoTexture');
+    // this.createMesh('idNoTexture');
     this.createLight(); // esse metodo esta fazendo um pointLight igual o createPointLight , porem com menos parametros, analisar o que é cada parametro passado. 
   }
   
@@ -63,8 +65,8 @@ export class RenderComponent implements OnInit {
     this.camera.position.z = 5;
     
     var animate = () =>{
-        requestAnimationFrame( animate );
-        this.renderer.render( this.scene, this.camera );
+      requestAnimationFrame( animate );        
+      this.renderer.render( this.scene, this.camera );
     };
     animate();
 
@@ -81,33 +83,33 @@ export class RenderComponent implements OnInit {
 
   async changeStatusLighting(a:string,e:Event){
 
-    if(a==="idPhong" && !this.checkPhong){
+    if(a==="idPhong" ){
       this.checkPhong = true;
       this.checkGouraud = false;
-    }else if(a==="idGouraud" && !this.checkGouraud){
+    }else if(a==="idGouraud" ){
       this.checkPhong = false;
       this.checkGouraud = true;
     }
-
+    await this.createMesh(a);
   }
 
   async changeStatus(a:string,e:Event){
-
-    if(a==='idWall'){
-      this.checkWall = !this.checkWall;
+   
+  if(a==='idWall'){
+      this.checkWall = true;
       this.checkWallMap = false;
       this.nocheck = false;
     }else if(a==='idWallMap'){
-      this.checkWallMap = !this.checkWallMap;
+      this.checkWallMap = true;
       this.checkWall = false;
       this.nocheck = false;
     }else{
-      this.nocheck = !this.nocheck;
+      this.nocheck = true;
       this.checkWall = false;
       this.checkWallMap = false;
     }
 
-    this.createMesh(a);
+    await this.createMesh(a);
 
   }
 
@@ -128,29 +130,33 @@ export class RenderComponent implements OnInit {
     (this.value1==='off')? color = new THREE.Color(0x000000):
                         color = new THREE.Color(0xffffff);
     this.scene.background = color;
-    // this.renderer.render(this.scene,this.camera);
     this.render();
   }
 
 
   configControls() {
-    //this.controls.autoRotate = true;
     this.controls.enableZoom = false;
     this.controls.enablePan  = false;
     this.controls.update();
   }
   
-  createMesh(typeItem:string): void {
+  async createMesh(typeItem:string): Promise<void> {
     
     var material; // metodo que carrega a textura e retorna para ser adicionada
-    
-    if(typeItem==='idWall'){
-      material = this.createWallBoxMaterial()
-    }else if(typeItem==='idWallMap'){
+    debugger
+    if(this.checkWall && this.checkPhong){
+      material = this.createWallBoxMaterial();
+    }else if(this.checkWall && this.checkGouraud){
+      material = this.createWoodBoxMaterialWithoutLight();
+    }else if(this.checkWallMap){
       material = this.createWallTextureAndMapBoxMaterial();
-    } else {
-      material = this.createNoTextureBoxMaterial();
+    }else if(this.nocheck && this.checkPhong){
+      material = this.createNoTextureBoxMaterial()
+    }else if(this.nocheck && this.checkGouraud){
+      material = this.createNoTextureBoxMaterialWithoutLight();
     }
+
+
     // var geometry = new THREE.BoxGeometry();
     this.cube = new THREE.Mesh( this.geometry, material );
     this.scene.add( this.cube );
@@ -183,7 +189,7 @@ export class RenderComponent implements OnInit {
   createWallBoxMaterial():any{
     const loader = new THREE.TextureLoader();
     const boxMaterial = new THREE.MeshPhongMaterial({ 
-      map: loader.load('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/14354e63-49e5-4ff6-a0aa-88619b1ca5e3/d90plia-a48d5b3e-ae2d-4a48-b2ea-d1b147f77945.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvMTQzNTRlNjMtNDllNS00ZmY2LWEwYWEtODg2MTliMWNhNWUzXC9kOTBwbGlhLWE0OGQ1YjNlLWFlMmQtNGE0OC1iMmVhLWQxYjE0N2Y3Nzk0NS5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.m0gxMdtjzAdV1gQJKRAOSylqf6p2Ii7ZsrOw_AzKm3M')
+      map: loader.load(`${ImagensMock[0].image}`)
     });
     boxMaterial.normalMap = null;
     return boxMaterial;
@@ -194,9 +200,9 @@ export class RenderComponent implements OnInit {
     const loader = new THREE.TextureLoader();
     
     const boxMaterial = new THREE.MeshPhongMaterial({ 
-      map: loader.load('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/14354e63-49e5-4ff6-a0aa-88619b1ca5e3/d90plia-a48d5b3e-ae2d-4a48-b2ea-d1b147f77945.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvMTQzNTRlNjMtNDllNS00ZmY2LWEwYWEtODg2MTliMWNhNWUzXC9kOTBwbGlhLWE0OGQ1YjNlLWFlMmQtNGE0OC1iMmVhLWQxYjE0N2Y3Nzk0NS5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.m0gxMdtjzAdV1gQJKRAOSylqf6p2Ii7ZsrOw_AzKm3M')
+      map: loader.load(`${ImagensMock[0].image}`)
     });
-    var normalMap = new THREE.TextureLoader().load("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/14354e63-49e5-4ff6-a0aa-88619b1ca5e3/d90plz3-5fa8674f-73b4-47b9-8a02-26a87d3d0c26.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvMTQzNTRlNjMtNDllNS00ZmY2LWEwYWEtODg2MTliMWNhNWUzXC9kOTBwbHozLTVmYTg2NzRmLTczYjQtNDdiOS04YTAyLTI2YTg3ZDNkMGMyNi5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.ydTIGrQHFicUICxKLys73hXlxYF0Y8y2BNCXWbddW2s");
+    var normalMap = new THREE.TextureLoader().load(`${ImagensMock[1].image}`);
 
     boxMaterial.normalMap = normalMap;
     boxMaterial.normalScale.set(1, 1.2);
@@ -207,10 +213,34 @@ export class RenderComponent implements OnInit {
   createNoTextureBoxMaterial():any{
     const loader = new THREE.TextureLoader();
     const boxMaterial = new THREE.MeshPhongMaterial({ 
-      map: loader.load('https://i0.wp.com/www.multarte.com.br/wp-content/uploads/2018/12/fundo-branco-liso2-1024x1024.jpg?resize=696%2C696&ssl=1')
+      map: loader.load(`${ImagensMock[2].image}`)
     });
     return boxMaterial;
   }
+
+  public createWoodBoxMaterialWithoutLight() {
+    const loader = new THREE.TextureLoader();
+
+    //Exemplo de mesma imagem para todas faces do cubo
+    const boxMaterial = new THREE.MeshBasicMaterial({ 
+      map: loader.load(`${ImagensMock[0].image}`)
+    })
+    
+    return boxMaterial;
+  }
+
+  public createNoTextureBoxMaterialWithoutLight() {
+    const loader = new THREE.TextureLoader();
+
+    //Exemplo de mesma imagem para todas faces do cubo
+    const boxMaterial = new THREE.MeshBasicMaterial({ 
+      map: loader.load(`${ImagensMock[2].image}`)
+    })
+    
+    return boxMaterial;
+  }
+
+
 
   /*=================================================================================================
                                     Iluminação de Phong
