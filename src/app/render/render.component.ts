@@ -32,7 +32,7 @@ export class RenderComponent implements OnInit {
   nocheck:boolean = true;
 
   checkPhong:boolean = true;
-  checkGouraud:boolean = false;
+  noLight:boolean = false;
 
   constructor() { 
     this.stateOptions = [
@@ -41,19 +41,17 @@ export class RenderComponent implements OnInit {
     ];
     
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    this.controls = new OrbitControls(this.camera,this.renderer.domElement);   
+    this.controls = new OrbitControls(this.camera,this.renderer.domElement);
+    this.createMesh('idNoTexture');   
   }
 
   ngOnInit(): void {
     this.createCanvas();
     this.createPhongLightning();
-    //this.configCamera()
-    this.createMesh('idNoTexture');
   }
 
   ngAfterViewInit(){
     this.configControls();
-    // this.createMesh('idNoTexture');
     this.createLight(); // esse metodo esta fazendo um pointLight igual o createPointLight , porem com menos parametros, analisar o que é cada parametro passado. 
   }
   
@@ -85,10 +83,10 @@ export class RenderComponent implements OnInit {
 
     if(a==="idPhong" ){
       this.checkPhong = true;
-      this.checkGouraud = false;
+      this.noLight = false;
     }else if(a==="idGouraud" ){
       this.checkPhong = false;
-      this.checkGouraud = true;
+      this.noLight = true;
     }
     await this.createMesh(a);
   }
@@ -143,20 +141,19 @@ export class RenderComponent implements OnInit {
   async createMesh(typeItem:string): Promise<void> {
     
     var material; // metodo que carrega a textura e retorna para ser adicionada
-    debugger
+
     if(this.checkWall && this.checkPhong){
       material = this.createWallBoxMaterial();
-    }else if(this.checkWall && this.checkGouraud){
+    }else if(this.checkWall && this.noLight){
       material = this.createWoodBoxMaterialWithoutLight();
     }else if(this.checkWallMap){
       material = this.createWallTextureAndMapBoxMaterial();
     }else if(this.nocheck && this.checkPhong){
       material = this.createNoTextureBoxMaterial()
-    }else if(this.nocheck && this.checkGouraud){
+    }else if(this.nocheck && this.noLight){
       material = this.createNoTextureBoxMaterialWithoutLight();
     }
-
-
+    
     // var geometry = new THREE.BoxGeometry();
     this.cube = new THREE.Mesh( this.geometry, material );
     this.scene.add( this.cube );
@@ -167,22 +164,6 @@ export class RenderComponent implements OnInit {
     this.light = new THREE.PointLight( 0xffffff );
 	  this.light.position.set( -10, 10, 10 );
 	  this.scene.add( this.light );
-  }
-
-  configCamera(): void {
-    this.camera.aspect = this.calculateAspectRatio();
-    this.camera.updateProjectionMatrix();
-	  this.camera.position.set( -15, 10, 15 );
-	  this.camera.lookAt( this.scene.position );
-  }
-
-  private calculateAspectRatio(): number {
-    
-    const height = window.innerHeight;
-    if (height === 0) {
-      return 0;
-    }
-    return window.innerWidth / window.innerHeight;
   }
 
 
