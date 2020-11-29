@@ -68,8 +68,11 @@ export class RenderComponent implements OnInit {
     };
     animate();
 
+    // Gambiarra no Canvas
     document.body.getElementsByTagName('canvas')[0].style.margin = "auto";
     document.body.getElementsByTagName('canvas')[0].style.padding = "0";
+    document.body.getElementsByTagName('canvas')[0].style.borderStyle = "solid";
+    document.body.getElementsByTagName('canvas')[0].style.borderColor = "#2196f3";
 
     this.createGrid();
     this.render();
