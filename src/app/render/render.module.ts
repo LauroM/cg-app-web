@@ -4,6 +4,8 @@ import { ButtonModule } from 'primeng/button';
 import { RenderComponent } from './render.component';
 import {SelectButtonModule} from 'primeng/selectbutton';
 import { FileSelectDirective } from 'ng2-file-upload';
+import {RadioButtonModule} from 'primeng/radiobutton';
+import { FormsModule }   from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -13,7 +15,9 @@ import { FileSelectDirective } from 'ng2-file-upload';
     CommonModule,
     ButtonModule,
     SelectButtonModule,
-    FileSelectDirective
+    FileSelectDirective,
+    RadioButtonModule,
+    FormsModule
   ]
 })
 export class RenderModule { }

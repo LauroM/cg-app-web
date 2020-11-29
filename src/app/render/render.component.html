@@ -3,8 +3,15 @@
     <p-selectButton [options]="stateOptions" [(ngModel)]="value1" optionLabel="label" optionValue="value" (onChange)="toggleBackground()"></p-selectButton>
 
     <!-- <p-button (click)="myUploader()" label="upload" ></p-button> -->
-</div>
 
+    <div>
+        <input id="idWood" type="radio" [checked]="checkWood" (change)="changeStatus('idWood',$event)"> Wood<br>
+        <input id="idFlower" type="radio" [checked]="checkFlower"(change)="changeStatus('idFlower',$event)"> Flowers<br>
+        <input id="idWall" type="radio" [checked]="checkWall" (change)="changeStatus('idWall',$event)"> Wall<br>
+        <input id="idNoTexture" type="radio" [checked]="checkNoTexture" (change)="changeStatus('idNoTexture',$event)"> No texture<br>
+    </div>
+
+</div>
 
 <!-- <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="myUploader($event)"></p-fileUpload> -->
 
