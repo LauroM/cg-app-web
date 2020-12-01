@@ -16,16 +16,16 @@ export class RenderComponent implements OnInit {
   stateOptions:any[];
   
   renderer = new THREE.WebGLRenderer();
+  geometry = new THREE.BoxGeometry();
+  public loader = new GLTFLoader();
   camera:any;
   value1: string = "off";
   myfile: any[] = [];
-  public loader = new GLTFLoader();
   cube:any=null;
   controls:any = null;
   mesh:any = null;
   light:any = null;
   boxmesh:any = null;
-  geometry = new THREE.BoxGeometry();
   
   checkWall:boolean = false;
   checkWallMap:boolean = false;
@@ -79,7 +79,7 @@ export class RenderComponent implements OnInit {
   }
 
 
-  async changeStatusLighting(a:string,e:Event){
+  public async changeStatusLighting(a:string,e:Event){
 
     if(a==="idPhong" ){
       this.checkPhong = true;
@@ -91,9 +91,9 @@ export class RenderComponent implements OnInit {
     await this.createMesh(a);
   }
 
-  async changeStatus(a:string,e:Event){
+  public async changeStatus(a:string,e:Event){
    
-  if(a==='idWall'){
+    if(a==='idWall'){
       this.checkWall = true;
       this.checkWallMap = false;
       this.nocheck = false;
@@ -111,13 +111,13 @@ export class RenderComponent implements OnInit {
 
   }
 
-  createGrid(){
+  public createGrid(){
     const gridHelper = new THREE.GridHelper( 10, 10 );
     gridHelper.position.y = -1;
     this.scene.add( gridHelper );
   }
 
-  animate(cube:any){
+  public animate(cube:any){
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
     this.render()
@@ -132,7 +132,7 @@ export class RenderComponent implements OnInit {
   }
 
 
-  configControls() {
+  public configControls() {
     this.controls.enableZoom = false;
     this.controls.enablePan  = false;
     this.controls.update();
@@ -160,14 +160,14 @@ export class RenderComponent implements OnInit {
     this.render();
   }
 
-  createLight(): void {
+  public createLight(): void {
     this.light = new THREE.PointLight( 0xffffff );
 	  this.light.position.set( -10, 10, 10 );
 	  this.scene.add( this.light );
   }
 
 
-  createWallBoxMaterial():any{
+  public createWallBoxMaterial():any{
     const loader = new THREE.TextureLoader();
     const boxMaterial = new THREE.MeshPhongMaterial({ 
       map: loader.load(`${ImagensMock[0].image}`)
@@ -177,7 +177,7 @@ export class RenderComponent implements OnInit {
   }
 
 
-  createWallTextureAndMapBoxMaterial():any{
+  public createWallTextureAndMapBoxMaterial():any{
     const loader = new THREE.TextureLoader();
     
     const boxMaterial = new THREE.MeshPhongMaterial({ 
@@ -191,7 +191,7 @@ export class RenderComponent implements OnInit {
     return boxMaterial;
   }
   
-  createNoTextureBoxMaterial():any{
+  public createNoTextureBoxMaterial():any{
     const loader = new THREE.TextureLoader();
     const boxMaterial = new THREE.MeshPhongMaterial({ 
       map: loader.load(`${ImagensMock[2].image}`)
@@ -222,7 +222,6 @@ export class RenderComponent implements OnInit {
   }
 
 
-
   /*=================================================================================================
                                     Iluminação de Phong
   ================================================================================================*/
@@ -232,20 +231,20 @@ export class RenderComponent implements OnInit {
     this.scene.add(this.createPointLight()); //iluminação pontual 
   }
 
-  createDirectionalLight = function() {
+  public createDirectionalLight() {
     var directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
     directionalLight.position.set(10,100,120);
     directionalLight.name='directional';
     return directionalLight
   };
 
-  createAmbientLight = function() {
+  public createAmbientLight() {
     var ambientLight = new THREE.AmbientLight(0x111111);
     ambientLight.name='ambient';
     return ambientLight;
   };
 
-  createPointLight = function(){
+  public createPointLight(){
     const light = new THREE.PointLight( 0xfffff, 1, 100 );
     light.position.set( 50, 50, 50 );
     return light
